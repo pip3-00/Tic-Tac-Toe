@@ -1,0 +1,413 @@
+/* Variables CSS para un diseño elegante y oscuro */
+:root {
+    --primary-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 100%);
+    --secondary-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    --accent-color: #8b5cf6;
+    --accent-hover: #7c3aed;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --bg-card: rgba(30, 41, 59, 0.85);
+    --bg-card-hover: rgba(30, 41, 59, 0.95);
+    --bg-box: rgba(51, 65, 85, 0.8);
+    --bg-box-hover: rgba(71, 85, 105, 0.9);
+    --shadow-dark: rgba(0, 0, 0, 0.4);
+    --shadow-medium: rgba(0, 0, 0, 0.3);
+    --shadow-light: rgba(0, 0, 0, 0.2);
+    --border-color: rgba(148, 163, 184, 0.2);
+    --border-hover: rgba(139, 92, 246, 0.5);
+    --border-radius: 12px;
+    --border-radius-large: 20px;
+    --transition-elegant: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --box-size: 100px;
+}
+
+body{
+    background: var(--primary-bg);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    text-align: center;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-family: var(--font-family);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 2rem;
+    overflow-x: hidden;
+    position: relative;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* Sutil patrón de fondo oscuro */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.03) 1px, transparent 0);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+h1{
+    font-family: var(--font-family);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 2.5rem 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* Tablero principal centrado */
+#board{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+/*liena del ganador*/
+
+.linea-ganador{
+    position: absolute;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+    display: none;
+    border-radius: 3px;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.linea-ganador.horizontal {
+    height: 4px;
+    width: 320px;
+    left: calc(50% - 160px);
+}
+
+.linea-ganador.vertical {
+    width: 4px;
+    height: 320px;
+    top: calc(50% - 160px);
+}
+
+.linea-ganador.diagonal {
+    height: 4px;
+    width: 320px;
+    left: calc(50% - 160px);
+    top: 50%;
+    transform-origin: center;
+}
+
+.linea-ganador.horizontal.linea-0 { top: 16.67%; }
+.linea-ganador.horizontal.linea-1 { top: 50%; }
+.linea-ganador.horizontal.linea-2 { top: 83.33%; }
+
+.linea-ganador.vertical.linea-0 { left: 16.67%; }
+.linea-ganador.vertical.linea-1 { left: 50%; }
+.linea-ganador.vertical.linea-2 { left: 83.33%; }
+
+.linea-ganador.diagonal.linea-0 { transform: rotate(45deg); }
+.linea-ganador.diagonal.linea-1 { transform: rotate(-45deg); }
+
+/* Tablero del juego con grid centrado */
+.table{
+    display: grid;
+    grid-template-columns: repeat(3, var(--box-size));
+    grid-template-rows: repeat(3, var(--box-size));
+    gap: 10px;
+    margin: 0;
+    padding: 25px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-large);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 10px 40px var(--shadow-dark),
+        0 1px 3px var(--shadow-light),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+/* Efecto de brillo en el borde del tablero */
+.table::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--border-radius-large);
+    padding: 1px;
+    background: linear-gradient(45deg, transparent, var(--accent-color), transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.table:hover::before {
+    opacity: 0.3;
+}
+
+.box{
+    background: var(--bg-box);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-elegant);
+    box-shadow: 
+        0 2px 8px var(--shadow-medium),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    position: relative;
+    backdrop-filter: blur(10px);
+    width: var(--box-size);
+    height: var(--box-size);
+}
+
+/* Efecto de brillo en las cajas */
+.box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--border-radius);
+    padding: 1px;
+    background: linear-gradient(45deg, var(--accent-color), transparent, var(--accent-color));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.box:hover::after {
+    opacity: 0.6;
+}
+
+.box:hover{
+    background: var(--bg-box-hover);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 16px var(--shadow-dark),
+        0 2px 8px var(--shadow-medium),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: var(--border-hover);
+}
+
+.box:active {
+    transform: translateY(0px);
+    box-shadow: 
+        0 1px 4px var(--shadow-medium),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.box:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 
+        0 0 0 3px rgba(139, 92, 246, 0.2),
+        0 2px 8px var(--shadow-medium),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.box:disabled {
+    cursor: default;
+    opacity: 0.7;
+    transform: none;
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--text-muted);
+}
+
+.box:disabled:hover {
+    transform: none;
+    box-shadow: 
+        0 2px 8px var(--shadow-medium),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Botón de reiniciar elegante oscuro */
+#reiniciar{
+    margin-top: 2.5rem;
+    padding: 0.875rem 2.25rem;
+    border-radius: 50px;
+    background: var(--accent-color);
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: var(--transition-elegant);
+    box-shadow: 
+        0 4px 14px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.025em;
+    position: relative;
+    overflow: hidden;
+    display: none; /* Oculto por defecto */
+}
+
+#reiniciar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+#reiniciar:hover::before {
+    left: 100%;
+}
+
+#reiniciar:hover{
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 20px rgba(139, 92, 246, 0.4),
+        0 2px 8px rgba(139, 92, 246, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+#reiniciar:active {
+    transform: translateY(0px);
+    box-shadow: 
+        0 2px 8px rgba(139, 92, 246, 0.3),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#reiniciar:focus {
+    outline: none;
+    box-shadow: 
+        0 0 0 3px rgba(139, 92, 246, 0.3),
+        0 4px 14px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Mensaje de resultado */
+#mensaje {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-height: 1.5rem;
+}
+
+/* Responsive design elegante para modo oscuro */
+@media (max-width: 768px) {
+    :root {
+        --box-size: 85px;
+    }
+    
+    body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .table {
+        padding: 20px;
+        gap: 8px;
+    }
+    
+    h1 {
+        margin-bottom: 2rem;
+    }
+    
+    #reiniciar {
+        padding: 0.75rem 2rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --box-size: 75px;
+    }
+    
+    body {
+        padding: 1rem 0.75rem;
+    }
+    
+    .table {
+        padding: 15px;
+        gap: 6px;
+    }
+}
+
+/* Animaciones sutiles para modo oscuro */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+h1 {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.table {
+    animation: fadeInUp 0.6s ease-out 0.15s both;
+}
+
+#reiniciar {
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+/* Efectos de entrada para las cajas */
+.box {
+    animation: slideIn 0.4s ease-out;
+}
+
+.box:nth-child(1) { animation-delay: 0.4s; }
+.box:nth-child(2) { animation-delay: 0.45s; }
+.box:nth-child(3) { animation-delay: 0.5s; }
+.box:nth-child(4) { animation-delay: 0.55s; }
+.box:nth-child(5) { animation-delay: 0.6s; }
+.box:nth-child(6) { animation-delay: 0.65s; }
+.box:nth-child(7) { animation-delay: 0.7s; }
+.box:nth-child(8) { animation-delay: 0.75s; }
+.box:nth-child(9) { animation-delay: 0.8s; }
