@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tic tac toe</title>
+    <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1> tic tac toe</h1>
+        <h1>Tic Tac Toe</h1>
     </header>
+    
+    <div class="controles">
+        <div class="fila-controles">
+            <div class="control-group">
+                <button id="toggleIA">Modo IA: ACTIVADO</button>
+            </div>
+            <div class="control-group">
+                <select id="selectorDificultad" disabled>
+                    <option value="facil">Fácil</option>
+                    <option value="medio">Medio</option>
+                    <option value="dificil">Difícil</option>
+                </select>
+            </div>
+        </div>
+    </div>
     <div id="board">
         <div class="linea-ganador"></div>
         <div class="table">
