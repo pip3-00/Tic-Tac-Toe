@@ -141,9 +141,9 @@ ocultarBotonReiniciar();
 toggleIA.addEventListener("click",() =>{
     modoIA = !modoIA;
 
-    toggleIA.textContent = modoIA
-    ? "ModoIA: ACTIVADO"
-    : "ModoIA: DESACTICADO";
+toggleIA.textContent = modoIA
+    ? "Modo IA: ACTIVADO"
+    : "Modo IA: DESACTIVADO";
 
     selectorDificultad.disabled =!modoIA;
       selectorDificultad.style.display = modoIA ? "inline-block" : "none";
@@ -195,24 +195,18 @@ function evaluar(tablero){
 
 //minimax
 
-function minimax(tablero, esMaximizador, profundiad = 0){
+function minimax(tablero, esMaximizador, profundidad = 0){
   const resultado = evaluar(tablero);
-  if (resultado !== null) return resultado - profundiad * (resultado);
+  if (resultado !== null) return resultado - profundidad * (resultado);
 
   if(esMaximizador){
     let mejor = -Infinity;
-    let movimientos = [];
     for(let i = 0; i < 9; i++){
       if(tablero[i] === ""){
         tablero[i] = "O";
-        mejor = Math.max(mejor,minimax(tablero, false, profundidad + 1));
+        const puntaje = minimax(tablero, false, profundidad + 1);
         tablero[i] = "";
-        if (puntaje > mejor){
-          mejor = mejorPuntaje;
-          movimientos = [i];
-        }else if(puntaje === mejor){
-          movimientos.push(i);
-        }
+        mejor = Math.max(mejor, puntaje);
       }
     }
     return mejor;
@@ -221,7 +215,7 @@ function minimax(tablero, esMaximizador, profundiad = 0){
     for(let i = 0; i < 9; i++){
       if(tablero[i] === ""){
         tablero[i] = "X";
-        mejor = Math.min(mejor, minimax(tablero, true, profundiad + 1));
+        const puntaje = minimax(tablero, true, profundidad + 1);
         tablero[i] = "" ;
         mejor = Math.min(mejor, puntaje);
       }
@@ -233,7 +227,7 @@ function minimax(tablero, esMaximizador, profundiad = 0){
 // nivel dificil (95% probabilidad de victoria)
 //Minimax + 5% de aleatoriedad para ser beatable
 function jugadaDificil(){
-  const tablero = obtenerTablero ();
+  const tablero = obtenerTablero();
   
   // 5% probabilidad de jugar aleatoriamente (subóptimo)
   if (Math.random() < 0.05) {
@@ -255,9 +249,9 @@ function jugadaDificil(){
   let mejorMovimiento = [];
 
   for(let i = 0; i < 9; i++){
-    if (tablero [i] === ""){
+    if (tablero[i] === ""){
       tablero[i] = "O";
-      const puntaje = minimax(tablero, false , 0);
+      const puntaje = minimax(tablero, false, 0);
       tablero[i] = ""; 
 
       if(puntaje > mejorPuntaje){
@@ -282,21 +276,24 @@ function jugadaAleatoria() {
 
   // 60% probabilidad de jugar mal a propósito
   if (Math.random() < 0.6) {
-    // Elegir una jugada que no sea la mejor
-    const movimientosMalos = [];
-    movimientosMalos.push(1, 3, 5, 7); // Esquinas y centros secundarios
+    // Elegir una jugada que no sea la mejor (esquinas y centros secundarios)
+    const indicesMalos = [1, 3, 5, 7]; // Posiciones menos estratégicas
+    const movimientosPosibles = [];
     
-    for (let i = 0; i < vacio.length; i++) {
-      if (movimientosMalos.includes(i)) {
-        movimientosMalos.push(i);
+    // Filtrar los botones vacíos que correspondan a posiciones "malas"
+    for (let i = 0; i < botones.length; i++) {
+      if (botones[i].textContent === "" && indicesMalos.includes(i)) {
+        movimientosPosibles.push(botones[i]);
       }
     }
     
-    const indiceMalo = movimientosMalos[Math.floor(Math.random() * movimientosMalos.length)];
-    if (vacio[indiceMalo]) {
-      vacio[indiceMalo].click();
-      return;
-    }
+    // Si no hay movimientos "malos" disponibles, usar cualquier movimiento
+    const botonSeleccionado = movimientosPosibles.length > 0 
+      ? movimientosPosibles[Math.floor(Math.random() * movimientosPosibles.length)]
+      : vacio[Math.floor(Math.random() * vacio.length)];
+      
+    botonSeleccionado.click();
+    return;
   }
 
   // 40% probabilidad de jugar normalmente
