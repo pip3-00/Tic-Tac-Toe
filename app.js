@@ -8,7 +8,12 @@ const botones = document.querySelectorAll (".box");
 const mensaje = document.getElementById("mensaje");
 const raya = document.querySelector(".linea-ganador");
 const reiniciar = document.getElementById("reiniciar");
+const toggleIA = document.getElementById("toggleIA");
+const selectorDificultad = document.getElementById("selectorDificultad");
 
+
+let modoIA = false;
+let dificultad = "facil";
 let turno = "X";
 let jugadas = 0;
 
@@ -109,6 +114,10 @@ botones.forEach(boton => {
     }
 
     turno = turno === "X" ? "O" : "X";
+
+    if (modoIA && turno === "O"){
+      setTimeout(jugadaIA, 500);
+    }
   });
 });
 
@@ -128,4 +137,207 @@ reiniciar.addEventListener("click", () => {
 // Ocultar botón al cargar la página
 ocultarBotonReiniciar();
 
+//boton ia activar y desactivar
+toggleIA.addEventListener("click",() =>{
+    modoIA = !modoIA;
 
+    toggleIA.textContent = modoIA
+    ? "ModoIA: ACTIVADO"
+    : "ModoIA: DESACTICADO";
+
+    selectorDificultad.disabled =!modoIA;
+      selectorDificultad.style.display = modoIA ? "inline-block" : "none";
+    
+
+    reiniciar.click();
+});
+
+// cambio de dificultad
+selectorDificultad.addEventListener("change", (e) => {
+  dificultad = e.target.value;
+  reiniciar.click();
+});
+
+
+
+//IA principal (Selector de dificultad)
+function jugadaIA(){
+  if(dificultad === "facil"){
+    jugadaAleatoria();
+
+  }else if (dificultad === "medio"){
+    jugadaDefensiva();
+  }
+  else if (dificultad === "dificil"){
+    jugadaDificil();
+  }
+}
+
+//tablero como array logico
+
+function obtenerTablero(){
+  return[...botones].map(b => b.textContent || "");
+}
+
+//evaluar tablero
+
+function evaluar(tablero){
+  for(let combo of combinaciones){
+    const [a,b,c] = combo;
+    if (tablero[a] && tablero[a] === tablero[b] && tablero[a] === tablero[c]) 
+  {
+      return tablero[a] === "O" ? 1 : -1;
+    }
+  }
+  if(tablero.every(c => c !== "")) return 0;
+  return null;
+}
+
+//minimax
+
+function minimax(tablero, esMaximizador, profundiad = 0){
+  const resultado = evaluar(tablero);
+  if (resultado !== null) return resultado - profundiad * (resultado);
+
+  if(esMaximizador){
+    let mejor = -Infinity;
+    let movimientos = [];
+    for(let i = 0; i < 9; i++){
+      if(tablero[i] === ""){
+        tablero[i] = "O";
+        mejor = Math.max(mejor,minimax(tablero, false, profundidad + 1));
+        tablero[i] = "";
+        if (puntaje > mejor){
+          mejor = mejorPuntaje;
+          movimientos = [i];
+        }else if(puntaje === mejor){
+          movimientos.push(i);
+        }
+      }
+    }
+    return mejor;
+  } else{
+    let mejor = Infinity;
+    for(let i = 0; i < 9; i++){
+      if(tablero[i] === ""){
+        tablero[i] = "X";
+        mejor = Math.min(mejor, minimax(tablero, true, profundiad + 1));
+        tablero[i] = "" ;
+        mejor = Math.min(mejor, puntaje);
+      }
+    }
+    return mejor;
+  }
+}
+
+// nivel dificil (95% probabilidad de victoria)
+//Minimax + 5% de aleatoriedad para ser beatable
+function jugadaDificil(){
+  const tablero = obtenerTablero ();
+  
+  // 5% probabilidad de jugar aleatoriamente (subóptimo)
+  if (Math.random() < 0.05) {
+    const movimientosPosibles = [];
+    for(let i = 0; i < 9; i++){
+      if (tablero[i] === "") {
+        movimientosPosibles.push(i);
+      }
+    }
+    if (movimientosPosibles.length > 0) {
+      const movimientoAleatorio = movimientosPosibles[Math.floor(Math.random() * movimientosPosibles.length)];
+      botones[movimientoAleatorio].click();
+      return;
+    }
+  }
+  
+  // 95% probabilidad de usar minimax (jugada óptima)
+  let mejorPuntaje = -Infinity;
+  let mejorMovimiento = [];
+
+  for(let i = 0; i < 9; i++){
+    if (tablero [i] === ""){
+      tablero[i] = "O";
+      const puntaje = minimax(tablero, false , 0);
+      tablero[i] = ""; 
+
+      if(puntaje > mejorPuntaje){
+        mejorPuntaje = puntaje;
+        mejorMovimiento = [i];
+      } else if(puntaje === mejorPuntaje){
+        mejorMovimiento.push(i);
+      }
+    }
+  }
+  if(mejorMovimiento.length > 0){
+    const movimiento = mejorMovimiento[Math.floor(Math.random() * mejorMovimiento.length)];
+    botones[movimiento].click();
+  }
+}
+
+//nivel facil (40% probabilidad de victoria)
+//Más errático, a veces juega mal a propósito
+function jugadaAleatoria() {
+  const vacio = [...botones].filter(b => b.textContent === "");
+  if (vacio.length === 0) return;
+
+  // 60% probabilidad de jugar mal a propósito
+  if (Math.random() < 0.6) {
+    // Elegir una jugada que no sea la mejor
+    const movimientosMalos = [];
+    movimientosMalos.push(1, 3, 5, 7); // Esquinas y centros secundarios
+    
+    for (let i = 0; i < vacio.length; i++) {
+      if (movimientosMalos.includes(i)) {
+        movimientosMalos.push(i);
+      }
+    }
+    
+    const indiceMalo = movimientosMalos[Math.floor(Math.random() * movimientosMalos.length)];
+    if (vacio[indiceMalo]) {
+      vacio[indiceMalo].click();
+      return;
+    }
+  }
+
+  // 40% probabilidad de jugar normalmente
+  vacio[Math.floor(Math.random() * vacio.length)].click();
+}
+
+//nivel medio (70% probabilidad de victoria)
+//Lógica defensiva + 30% de aleatoriedad
+function jugadaDefensiva(){
+  // 30% probabilidad de jugar aleatoriamente (erráticamente)
+  if (Math.random() < 0.3) {
+    jugadaAleatoria();
+    return;
+  }
+  
+  // 70% probabilidad de jugar defensivamente
+  for (let combo of combinaciones) {
+    const jugada = buscarJugada(combo , "O");
+    if( jugada !== null){
+      botones[jugada].click();
+      return;
+    }
+    
+  }
+  // Si no hay jugadas defensivas, jugar aleatoriamente
+  jugadaAleatoria();
+}
+
+function buscarJugada(combo, jugador) {
+  const[a,b,c] = combo;
+  const valores =[
+    botones[a].textContent,
+    botones[b].textContent,
+    botones[c].textContent
+  ];
+  
+  if (
+    valores.filter( v => v === jugador).length === 2 && 
+    valores.includes("")
+  ) {
+    return combo[valores.indexOf("")];
+  }
+  return null;
+}

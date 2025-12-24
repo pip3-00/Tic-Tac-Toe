@@ -8,8 +8,23 @@
 </head>
 <body>
     <header>
-        <h1>Juego de Tic Tac Toe</h1>
+        <h1>Tic Tac Toe</h1>
     </header>
+    
+    <div class="controles">
+        <div class="fila-controles">
+            <div class="control-group">
+                <button id="toggleIA">Modo IA: ACTIVADO</button>
+            </div>
+            <div class="control-group">
+                <select id="selectorDificultad" disabled>
+                    <option value="facil">Fácil</option>
+                    <option value="medio">Medio</option>
+                    <option value="dificil">Difícil</option>
+                </select>
+            </div>
+        </div>
+    </div>
     <div id="board">
         <div class="linea-ganador"></div>
         <div class="table">
